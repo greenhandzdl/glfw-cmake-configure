@@ -8,18 +8,18 @@
 
 // Platform detection macros
 #if defined(__APPLE__)
-    #define GLFW_PLATFORM_MACOS 1
-    #define GLFW_PLATFORM_LINUX 0
-    // Suppress OpenGL deprecation warnings on macOS
-    #ifndef GL_SILENCE_DEPRECATION
-        #define GL_SILENCE_DEPRECATION
-    #endif
+ #define GLFW_PLATFORM_MACOS 1
+ #define GLFW_PLATFORM_LINUX 0
+ // Suppress OpenGL deprecation warnings on macOS
+ #ifndef GL_SILENCE_DEPRECATION
+  #define GL_SILENCE_DEPRECATION
+ #endif
 #elif defined(__linux__)
-    #define GLFW_PLATFORM_MACOS 0
-    #define GLFW_PLATFORM_LINUX 1
+ #define GLFW_PLATFORM_MACOS 0
+ #define GLFW_PLATFORM_LINUX 1
 #else
-    #define GLFW_PLATFORM_MACOS 0
-    #define GLFW_PLATFORM_LINUX 0
+ #define GLFW_PLATFORM_MACOS 0
+ #define GLFW_PLATFORM_LINUX 0
 #endif
 
 // Common macros
@@ -31,15 +31,15 @@
 #define WINDOW_HEIGHT 600
 #define WINDOW_TITLE "GLFW + GLEW Template Application"
 
-// On macOS with GLEW, we need to include GLEW before GLFW
-// to avoid gl.h conflicts
+// GLEW must be included before GLFW to avoid gl.h conflicts
+// On macOS, keep original behavior
 #if GLFW_PLATFORM_MACOS
-    #include <GL/glew.h>
-    #include <GLFW/glfw3.h>
+ #include <GL/glew.h>
+ #include <GLFW/glfw3.h>
 #else
-    // On Linux, include GLFW first, then GLEW
-    #include <GLFW/glfw3.h>
-    #include <GL/glew.h>
+ // On Linux, GLEW must also come first since glfw3.h includes gl.h internally
+ #include <GL/glew.h>
+ #include <GLFW/glfw3.h>
 #endif
 
 #endif // GLFW_TEMPLATE_COMMON_H
