@@ -1,0 +1,37 @@
+#!/bin/bash
+# clean.sh - Clean build artifacts
+# Usage: ./scripts/clean.sh [all]
+
+set -e
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
+BUILD_DIR="$PROJECT_ROOT/@BUILD_DIR_NAME@"
+OUTPUT_DIR="$PROJECT_ROOT/@OUTPUT_DIR_NAME@"
+
+echo "========================================="
+echo "GLFW Template Clean Script"
+echo "========================================="
+
+# Clean build directory
+if [ "$1" = "all" ]; then
+    echo "Cleaning all directories..."
+    if [ -d "$BUILD_DIR" ]; then
+        rm -rf "$BUILD_DIR"
+        echo "Removed: $BUILD_DIR"
+    fi
+    if [ -d "$OUTPUT_DIR" ]; then
+        rm -rf "$OUTPUT_DIR"
+        echo "Removed: $OUTPUT_DIR"
+    fi
+else
+    echo "Cleaning build directory..."
+    if [ -d "$BUILD_DIR" ]; then
+        rm -rf "$BUILD_DIR"
+        echo "Removed: $BUILD_DIR"
+    fi
+fi
+
+echo "========================================="
+echo "Clean complete!"
+echo "========================================="

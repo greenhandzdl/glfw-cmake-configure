@@ -1,0 +1,57 @@
+#!/bin/bash
+# build.sh - Build script for GLFW Template
+# Usage: ./scripts/build.sh [debug|release]
+
+set -e
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
+BUILD_DIR="$PROJECT_ROOT/@BUILD_DIR_NAME@"
+OUTPUT_DIR="$PROJECT_ROOT/@OUTPUT_DIR_NAME@"
+
+# Default build type
+BUILD_TYPE="Release"
+
+if [ -n "$1" ]; then
+  case "$1" in
+    debug|Debug|DEBUG)
+      BUILD_TYPE="Debug"
+      ;;
+    release|Release|RELEASE)
+      BUILD_TYPE="Release"
+      ;;
+    *)
+      echo "Unknown build type: $1"
+      echo "Usage: $0 [debug|release]"
+      exit 1
+      ;;
+  esac
+fi
+
+echo "========================================="
+echo "GLFW Template Build Script"
+echo "========================================="
+echo "Build Type: $BUILD_TYPE"
+echo "Project Root: $PROJECT_ROOT"
+echo "Build Directory: $BUILD_DIR"
+echo "Output Directory: $OUTPUT_DIR"
+echo "========================================="
+
+# Create build directory if it doesn't exist
+mkdir -p "$BUILD_DIR"
+
+# Navigate to build directory
+cd "$BUILD_DIR"
+
+# Configure with CMake
+echo "Configuring with CMake..."
+cmake -DCMAKE_BUILD_TYPE="$BUILD_TYPE" "$PROJECT_ROOT"
+
+# Build
+echo "Building..."
+cmake --build . --config "$BUILD_TYPE"
+
+echo "========================================="
+echo "Build complete!"
+echo "Executable: $OUTPUT_DIR/@TARGET_NAME@"
+echo "========================================="

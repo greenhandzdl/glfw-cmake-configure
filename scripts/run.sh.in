@@ -1,0 +1,29 @@
+#!/bin/bash
+# run.sh - Run the GLFW Template application
+# Usage: ./scripts/run.sh [executable_name]
+
+set -e
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
+BUILD_DIR="$PROJECT_ROOT/@BUILD_DIR_NAME@"
+OUTPUT_DIR="$PROJECT_ROOT/@OUTPUT_DIR_NAME@"
+EXECUTABLE="$OUTPUT_DIR/@TARGET_NAME@"
+
+echo "========================================="
+echo "GLFW Template Run Script"
+echo "========================================="
+echo "Executable: $EXECUTABLE"
+echo "========================================="
+
+# Check if executable exists
+if [ ! -f "$EXECUTABLE" ]; then
+    echo "Error: Executable not found: $EXECUTABLE"
+    echo "Please build the project first using: ./scripts/build.sh"
+    exit 1
+fi
+
+# Run the executable
+echo "Running application..."
+echo ""
+"$EXECUTABLE"
