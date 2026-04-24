@@ -1,80 +1,50 @@
-# GLFW + GLEW CMake Template
+# GLFW + GLAD CMake 模板
 
-Cross-platform CMake template for modern OpenGL applications using GLFW and GLEW.
+跨平台的现代 OpenGL CMake 模板，使用 GLFW 创建窗口、GLAD 加载 OpenGL 函数。
 
-## Prerequisites
+## 依赖
 
-**macOS:**
+GLAD 已内嵌在项目中（`third_party/glad/`），无需额外安装。
+
+**macOS：**
 ```bash
-brew install glfw glew cmake
+brew install glfw cmake
 ```
 
-**Linux (Ubuntu/Debian):**
+**Linux (Ubuntu/Debian)：**
 ```bash
-sudo apt-get install libglfw3-dev libglew-dev cmake build-essential
+sudo apt-get install libglfw3-dev cmake build-essential
 ```
 
-**Linux (Fedora/RHEL):**
+**Linux (Fedora/RHEL)：**
 ```bash
-sudo dnf install glfw-devel glew-devel cmake gcc-c++
+sudo dnf install glfw-devel cmake gcc-c++
 ```
 
-## Build
+## 构建 & 运行
 
 ```bash
 mkdir build && cd build
 cmake ..
 cmake --build .
-```
-
-Or use the script:
-```bash
-./scripts/build.sh
-```
-
-## Run
-
-```bash
 ./output/GLFW_Template
 ```
 
-## Clean
+## 操作
+
+- **R** — 开关旋转
+- **空格** — 重置旋转
+- **ESC** — 退出
+
+## 清理
 
 ```bash
 cmake --build build --target clean-project
 ```
 
-Removes `build/`, `output/`, and generated scripts.
+删除 `build/`、`output/` 及生成的脚本。
 
-## Controls
+## 平台说明
 
-- **R** - Toggle rotation
-- **SPACE** - Reset rotation  
-- **ESC** - Exit
-
-## Platform Notes
-
-**macOS:** Uses Cocoa framework, OpenGL 4.1 Metal backend. Full GLEW support.
-
-**Linux:** Uses X11, OpenGL 3.3+ Core Profile.
-
-## CMake Options
-
-```bash
-cmake -DCMAKE_BUILD_TYPE=Debug ..
-cmake -DBUILD_EXAMPLES=OFF ..
-```
-
-## Why GLFW?
-
-Recommended for:
-- Modern OpenGL (3.3+) development
-- Advanced window/input handling
-- Production applications
-- Stable GLEW integration on macOS
-
-## Related
-
-- FreeGLUT template for traditional OpenGL
-- GLFW: https://www.glfw.org/
-- GLEW: http://glew.sourceforge.net/
+- **macOS**：Cocoa 框架，OpenGL 4.1 Metal 后端
+- **Linux**：X11，OpenGL 3.3+ Core Profile

@@ -9,11 +9,11 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # Platform Detection
 # ============================================================================
 if(APPLE)
-    message(STATUS "Building on macOS")
-    set(IS_MACOS TRUE)
+  message(STATUS "Building on macOS")
+  set(IS_MACOS TRUE)
 elseif(UNIX)
-    message(STATUS "Building on Linux")
-    set(IS_LINUX TRUE)
+  message(STATUS "Building on Linux")
+  set(IS_LINUX TRUE)
 endif()
 
 # ============================================================================
@@ -30,25 +30,25 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/output)
 # macOS Specific Configuration
 # ============================================================================
 if(IS_MACOS)
-    # Find Homebrew prefix
-    execute_process(
-        COMMAND brew --prefix
-        OUTPUT_VARIABLE BREW_PREFIX
-        OUTPUT_STRIP_TRAILING_WHITESPACE
-        ERROR_QUIET
-    )
+  # Find Homebrew prefix
+  execute_process(
+    COMMAND brew --prefix
+    OUTPUT_VARIABLE BREW_PREFIX
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+    ERROR_QUIET
+  )
 
-    if(BREW_PREFIX)
-        message(STATUS "Homebrew prefix: ${BREW_PREFIX}")
-        list(APPEND CMAKE_PREFIX_PATH "${BREW_PREFIX}")
-        list(APPEND CMAKE_LIBRARY_PATH "${BREW_PREFIX}/lib")
-        list(APPEND CMAKE_INCLUDE_PATH "${BREW_PREFIX}/include")
-    endif()
+  if(BREW_PREFIX)
+    message(STATUS "Homebrew prefix: ${BREW_PREFIX}")
+    list(APPEND CMAKE_PREFIX_PATH "${BREW_PREFIX}")
+    list(APPEND CMAKE_LIBRARY_PATH "${BREW_PREFIX}/lib")
+    list(APPEND CMAKE_INCLUDE_PATH "${BREW_PREFIX}/include")
+  endif()
 
-    # Cocoa framework for macOS (required for GLFW native backend)
-    find_library(COCOA_FRAMEWORK Cocoa)
-    find_library(IOKIT_FRAMEWORK IOKit)
-    find_library(COREVIDEO_FRAMEWORK CoreVideo)
+  # Cocoa framework for macOS (required for GLFW native backend)
+  find_library(COCOA_FRAMEWORK Cocoa)
+  find_library(IOKIT_FRAMEWORK IOKit)
+  find_library(COREVIDEO_FRAMEWORK CoreVideo)
 endif()
 
 # ============================================================================
@@ -58,111 +58,76 @@ endif()
 find_package(glfw3 QUIET)
 
 if(TARGET glfw)
-    message(STATUS "Found GLFW3 (glfw target)")
-    set(GLFW_TARGET glfw)
-    set(GLFW_FOUND TRUE)
+  message(STATUS "Found GLFW3 (glfw target)")
+  set(GLFW_TARGET glfw)
+  set(GLFW_FOUND TRUE)
 elseif(TARGET glfw::glfw)
-    message(STATUS "Found GLFW3 (glfw::glfw target)")
-    set(GLFW_TARGET glfw::glfw)
-    set(GLFW_FOUND TRUE)
+  message(STATUS "Found GLFW3 (glfw::glfw target)")
+  set(GLFW_TARGET glfw::glfw)
+  set(GLFW_FOUND TRUE)
 else()
-    # Fallback: find_package with CONFIG
-    find_package(GLFW3 QUIET CONFIG)
-    if(TARGET GLFW3::GLFW)
-        message(STATUS "Found GLFW3 (GLFW3::GLFW target)")
-        set(GLFW_TARGET GLFW3::GLFW)
-        set(GLFW_FOUND TRUE)
-    endif()
+  # Fallback: find_package with CONFIG
+  find_package(GLFW3 QUIET CONFIG)
+  if(TARGET GLFW3::GLFW)
+    message(STATUS "Found GLFW3 (GLFW3::GLFW target)")
+    set(GLFW_TARGET GLFW3::GLFW)
+    set(GLFW_FOUND TRUE)
+  endif()
 endif()
 
 if(NOT GLFW_FOUND)
-    message(FATAL_ERROR "GLFW3 not found. Please install GLFW:\n"
-        "  macOS: brew install glfw\n"
-        "  Linux: sudo apt-get install libglfw3-dev")
+  message(FATAL_ERROR "GLFW3 not found. Please install GLFW:\n"
+         " macOS:   brew install glfw\n"
+         " Linux:  sudo apt-get install libglfw3-dev")
 endif()
 
 # ============================================================================
-# Find GLEW
+# GLAD (OpenGL Loader - embedded source)
 # ============================================================================
-find_package(GLEW QUIET)
-
-if(TARGET GLEW::GLEW)
-    message(STATUS "Found GLEW (GLEW::GLEW target)")
-    set(GLEW_TARGET GLEW::GLEW)
-    set(GLEW_FOUND TRUE)
-elseif(TARGET glew)
-    message(STATUS "Found GLEW (glew target)")
-    set(GLEW_TARGET glew)
-    set(GLEW_FOUND TRUE)
-else()
-    # Fallback: try to find glew via pkg-config on Linux
-    if(IS_LINUX)
-        find_package(PkgConfig)
-        if(PkgConfig_FOUND)
-            pkg_check_modules(GLEW glew)
-            if(GLEW_FOUND)
-                message(STATUS "Found GLEW via pkg-config")
-                set(GLEW_TARGET ${GLEW_LIBRARIES})
-                set(GLEW_FOUND TRUE)
-            endif()
-        endif()
-    endif()
-
-    # Last resort: manual search
-    if(NOT GLEW_FOUND)
-        find_path(GLEW_INCLUDE_DIR GL/glew.h)
-        find_library(GLEW_LIBRARY NAMES GLEW glew libglew)
-        if(GLEW_INCLUDE_DIR AND GLEW_LIBRARY)
-            message(STATUS "Found GLEW (manual search)")
-            set(GLEW_TARGET ${GLEW_LIBRARY})
-            set(GLEW_FOUND TRUE)
-        endif()
-    endif()
-endif()
-
-if(NOT GLEW_FOUND)
-    message(FATAL_ERROR "GLEW not found. Please install GLEW:\n"
-        "  macOS: brew install glew\n"
-        "  Linux: sudo apt-get install libglew-dev")
-endif()
+add_library(glad STATIC
+  ${CMAKE_SOURCE_DIR}/third_party/glad/src/glad.c
+)
+target_include_directories(glad PUBLIC
+  ${CMAKE_SOURCE_DIR}/third_party/glad/include
+)
 
 # ============================================================================
 # Find OpenGL
 # ============================================================================
 if(IS_LINUX)
-    find_package(OpenGL REQUIRED)
+  find_package(OpenGL REQUIRED)
 elseif(IS_MACOS)
-    # macOS has OpenGL in system frameworks
-    find_library(OPENGL_LIBRARY OpenGL)
-    find_library(GLU_LIBRARY GLU)
+  # macOS has OpenGL in system frameworks
+  find_library(OPENGL_LIBRARY OpenGL)
+  find_library(GLU_LIBRARY GLU)
 endif()
 
 # ============================================================================
 # Find required system libraries for Linux
 # ============================================================================
 if(IS_LINUX)
-    find_package(X11 REQUIRED)
-    find_package(Threads REQUIRED)
+  find_package(X11 REQUIRED)
+  find_package(Threads REQUIRED)
 endif()
 
 # ============================================================================
 # Source Files
 # ============================================================================
 set(HEADER_FILES
-    ${CMAKE_SOURCE_DIR}/src/headers/common.h
-    ${CMAKE_SOURCE_DIR}/src/headers/gl_utils.h
-    ${CMAKE_SOURCE_DIR}/src/headers/window.h
+  ${CMAKE_SOURCE_DIR}/src/headers/common.h
+  ${CMAKE_SOURCE_DIR}/src/headers/gl_utils.h
+  ${CMAKE_SOURCE_DIR}/src/headers/window.h
 )
 
 set(UTILS_FILES
-    ${CMAKE_SOURCE_DIR}/src/utils/gl_utils.cpp
-    ${CMAKE_SOURCE_DIR}/src/utils/window.cpp
+  ${CMAKE_SOURCE_DIR}/src/utils/gl_utils.cpp
+  ${CMAKE_SOURCE_DIR}/src/utils/window.cpp
 )
 
 set(SOURCE_FILES
-    ${CMAKE_SOURCE_DIR}/src/main.cpp
-    ${CMAKE_SOURCE_DIR}/src/utils/gl_utils.cpp
-    ${CMAKE_SOURCE_DIR}/src/utils/window.cpp
+  ${CMAKE_SOURCE_DIR}/src/main.cpp
+  ${CMAKE_SOURCE_DIR}/src/utils/gl_utils.cpp
+  ${CMAKE_SOURCE_DIR}/src/utils/window.cpp
 )
 
 # ============================================================================
@@ -171,46 +136,47 @@ set(SOURCE_FILES
 set(TARGET_NAME "GLFW_Template")
 
 add_executable(${TARGET_NAME}
-    ${SOURCE_FILES}
-    ${HEADER_FILES}
+  ${SOURCE_FILES}
+  ${HEADER_FILES}
 )
 
 target_include_directories(${TARGET_NAME} PRIVATE
-    ${CMAKE_SOURCE_DIR}/src/headers
-    ${OPENGL_INCLUDE_DIR}
+  ${CMAKE_SOURCE_DIR}/src/headers
+  ${OPENGL_INCLUDE_DIR}
 )
 
 target_link_libraries(${TARGET_NAME} PRIVATE
-    ${GLFW_TARGET}
-    ${GLEW_TARGET}
+  ${GLFW_TARGET}
+  glad
 )
 
 # Platform specific libraries
 if(IS_MACOS)
-    message(STATUS "Linking macOS frameworks...")
-    target_link_libraries(${TARGET_NAME} PRIVATE
-        ${OPENGL_LIBRARY}
-        ${COCOA_FRAMEWORK}
-        ${IOKIT_FRAMEWORK}
-        ${COREVIDEO_FRAMEWORK}
-    )
-    target_compile_definitions(${TARGET_NAME} PRIVATE
-        GL_SILENCE_DEPRECATION
-    )
+  message(STATUS "Linking macOS frameworks...")
+  target_link_libraries(${TARGET_NAME} PRIVATE
+    ${OPENGL_LIBRARY}
+    ${COCOA_FRAMEWORK}
+    ${IOKIT_FRAMEWORK}
+    ${COREVIDEO_FRAMEWORK}
+  )
+  target_compile_definitions(${TARGET_NAME} PRIVATE
+    GL_SILENCE_DEPRECATION
+  )
 elseif(IS_LINUX)
-    message(STATUS "Linking Linux libraries...")
-    target_link_libraries(${TARGET_NAME} PRIVATE
-        ${OPENGL_LIBRARIES}
-        X11
-        Threads::Threads
-        m
-    )
+  message(STATUS "Linking Linux libraries...")
+  target_link_libraries(${TARGET_NAME} PRIVATE
+    ${OPENGL_LIBRARIES}
+    X11
+    Threads::Threads
+    m
+    dl
+  )
 endif()
 
 # Set properties
 set_target_properties(${TARGET_NAME} PROPERTIES
-    OUTPUT_NAME ${TARGET_NAME}
-    RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/output
+  OUTPUT_NAME ${TARGET_NAME}
+  RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/output
 )
 
 # ============================================================================
@@ -220,21 +186,21 @@ set(BUILD_DIR_NAME "build")
 set(OUTPUT_DIR_NAME "output")
 
 configure_file(
-    ${CMAKE_SOURCE_DIR}/scripts/build.sh.in
-    ${CMAKE_SOURCE_DIR}/scripts/build.sh
-    @ONLY
+  ${CMAKE_SOURCE_DIR}/scripts/build.sh.in
+  ${CMAKE_SOURCE_DIR}/scripts/build.sh
+  @ONLY
 )
 
 configure_file(
-    ${CMAKE_SOURCE_DIR}/scripts/clean.sh.in
-    ${CMAKE_SOURCE_DIR}/scripts/clean.sh
-    @ONLY
+  ${CMAKE_SOURCE_DIR}/scripts/clean.sh.in
+  ${CMAKE_SOURCE_DIR}/scripts/clean.sh
+  @ONLY
 )
 
 configure_file(
-    ${CMAKE_SOURCE_DIR}/scripts/run.sh.in
-    ${CMAKE_SOURCE_DIR}/scripts/run.sh
-    @ONLY
+  ${CMAKE_SOURCE_DIR}/scripts/run.sh.in
+  ${CMAKE_SOURCE_DIR}/scripts/run.sh
+  @ONLY
 )
 
 # Make scripts executable
@@ -246,27 +212,24 @@ execute_process(COMMAND chmod +x ${CMAKE_SOURCE_DIR}/scripts/run.sh)
 # Clean Project Target
 # ============================================================================
 add_custom_target(clean-project
-    COMMENT "Cleaning all generated files (build, output, scripts)..."
-    COMMAND ${CMAKE_COMMAND} -E remove_directory ${CMAKE_SOURCE_DIR}/build
-    COMMAND ${CMAKE_COMMAND} -E remove_directory ${CMAKE_SOURCE_DIR}/output
-    COMMAND ${CMAKE_COMMAND} -E remove -f ${CMAKE_SOURCE_DIR}/scripts/build.sh
-    COMMAND ${CMAKE_COMMAND} -E remove -f ${CMAKE_SOURCE_DIR}/scripts/clean.sh
-    COMMAND ${CMAKE_COMMAND} -E remove -f ${CMAKE_SOURCE_DIR}/scripts/run.sh
-    COMMAND ${CMAKE_COMMAND} -E echo "Clean complete!"
+  COMMENT "Cleaning all generated files (build, output, scripts)..."
+  COMMAND ${CMAKE_COMMAND} -E remove_directory ${CMAKE_SOURCE_DIR}/build
+  COMMAND ${CMAKE_COMMAND} -E remove_directory ${CMAKE_SOURCE_DIR}/output
+  COMMAND ${CMAKE_COMMAND} -E remove -f ${CMAKE_SOURCE_DIR}/scripts/build.sh
+  COMMAND ${CMAKE_COMMAND} -E remove -f ${CMAKE_SOURCE_DIR}/scripts/clean.sh
+  COMMAND ${CMAKE_COMMAND} -E remove -f ${CMAKE_SOURCE_DIR}/scripts/run.sh
+  COMMAND ${CMAKE_COMMAND} -E echo "Clean complete!"
 )
-
-# ============================================================================
-# Configuration Summary
-# ============================================================================
 
 # ============================================================================
 # Configuration Summary
 # ============================================================================
 message(STATUS "")
 message(STATUS "Configuration Summary:")
-message(STATUS " Build Type: ${CMAKE_BUILD_TYPE}")
-message(STATUS " Platform: ${CMAKE_SYSTEM_NAME}")
-message(STATUS " GLFW: ${GLFW_FOUND}")
-message(STATUS " GLFW Target: ${GLFW_TARGET}")
-message(STATUS " Output Directory: ${CMAKE_SOURCE_DIR}/output")
+message(STATUS "  Build Type:      ${CMAKE_BUILD_TYPE}")
+message(STATUS "  Platform:        ${CMAKE_SYSTEM_NAME}")
+message(STATUS "  GLFW:            ${GLFW_FOUND}")
+message(STATUS "  GLFW Target:     ${GLFW_TARGET}")
+message(STATUS "  GLAD:            embedded (OpenGL 3.3 Core)")
+message(STATUS "  Output Directory: ${CMAKE_SOURCE_DIR}/output")
 message(STATUS "")

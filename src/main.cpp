@@ -1,10 +1,10 @@
 /**
  * @file main.cpp
- * @brief GLFW + GLEW Template Application
+ * @brief GLFW + GLAD Template Application
  *
- * A modern OpenGL template using GLEW for OpenGL extension loading.
+ * A modern OpenGL template using GLAD for OpenGL extension loading.
  * Demonstrates:
- * - GLEW initialization
+ * - GLAD initialization
  * - Modern OpenGL (3.3 Core Profile)
  * - Vertex and Fragment shaders
  * - VAO/VBO for geometry
@@ -157,22 +157,26 @@ void initGeometry() {
     };
 
     unsigned int indices[] = {
-        0, 1, 2, 2, 3, 0,       // Front
-        4, 5, 6, 6, 7, 4,       // Back
-        8, 9, 10, 10, 11, 8,    // Top
-        12, 13, 14, 14, 15, 12, // Bottom
-        16, 17, 18, 18, 19, 16, // Right
-        20, 21, 22, 22, 23, 20  // Left
+        0,  1,  2,  2,  3,  0,   // Front
+        4,  5,  6,  6,  7,  4,   // Back
+        8,  9,  10, 10, 11, 8,   // Top
+        12, 13, 14, 14, 15, 12,  // Bottom
+        16, 17, 18, 18, 19, 16,  // Right
+        20, 21, 22, 22, 23, 20   // Left
     };
 
+    unsigned int EBO;
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
-    glGenBuffers(1, &VBO);
+    glGenBuffers(1, &EBO);
 
     glBindVertexArray(VAO);
 
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
     // Position attribute
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
@@ -189,13 +193,13 @@ void initGeometry() {
 // ============================================================================
 void printInfo() {
     std::cout << "=====================================" << std::endl;
-    std::cout << " GLFW + GLEW Template Application" << std::endl;
+    std::cout << " GLFW + GLAD Template Application" << std::endl;
     std::cout << " Version: " << APP_VERSION << std::endl;
     std::cout << "=====================================" << std::endl;
     std::cout << " Controls:" << std::endl;
-    std::cout << "  R - Toggle rotation" << std::endl;
-    std::cout << "  SPACE - Reset rotation" << std::endl;
-    std::cout << "  ESC - Exit" << std::endl;
+    std::cout << " R - Toggle rotation" << std::endl;
+    std::cout << " SPACE - Reset rotation" << std::endl;
+    std::cout << " ESC - Exit" << std::endl;
     std::cout << "=====================================" << std::endl;
 }
 
@@ -251,18 +255,15 @@ int main(int argc, char** argv) {
 
     glfwMakeContextCurrent(window);
 
-    // Initialize GLEW
-    glewExperimental = GL_TRUE;
-    GLenum err = glewInit();
-    if (err != GLEW_OK) {
-        std::cerr << "Error: Failed to initialize GLEW: " << glewGetErrorString(err) << std::endl;
+    // Initialize GLAD
+    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
+        std::cerr << "Error: Failed to initialize GLAD" << std::endl;
         glfwDestroyWindow(window);
         glfwTerminate();
         return 1;
     }
 
-    std::cout << "GLEW initialized successfully!" << std::endl;
-    std::cout << "Using GLEW version: " << glewGetString(GLEW_VERSION) << std::endl;
+    std::cout << "GLAD initialized successfully!" << std::endl;
 
     // Print OpenGL info
     printGLInfo();
@@ -341,7 +342,7 @@ int main(int argc, char** argv) {
 
         // Draw
         glBindVertexArray(VAO);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
+        glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);
 
         // Swap buffers and poll events

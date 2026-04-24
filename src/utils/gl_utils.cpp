@@ -15,22 +15,16 @@ void initGL() {
     // Enable depth testing
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LEQUAL);
-
-    // Enable smooth shading
-    glShadeModel(GL_SMOOTH);
-
-    // Set hint for perspective correction (optional, may not work on all platforms)
-    glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
 }
 
 void printGLInfo() {
     std::cout << "=====================================" << std::endl;
-    std::cout << " OpenGL Information" << std::endl;
+    std::cout << "  OpenGL Information" << std::endl;
     std::cout << "=====================================" << std::endl;
-    std::cout << " Vendor: " << getVendor() << std::endl;
-    std::cout << " Renderer: " << getRenderer() << std::endl;
-    std::cout << " OpenGL Version: " << getGLVersion() << std::endl;
-    std::cout << " GLSL Version: " << getGLSLVersion() << std::endl;
+    std::cout << "  Vendor:          " << getVendor() << std::endl;
+    std::cout << "  Renderer:        " << getRenderer() << std::endl;
+    std::cout << "  OpenGL Version:  " << getGLVersion() << std::endl;
+    std::cout << "  GLSL Version:    " << getGLSLVersion() << std::endl;
     std::cout << "=====================================" << std::endl;
 }
 

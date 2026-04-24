@@ -23,23 +23,16 @@
 #endif
 
 // Common macros
-#define APP_NAME "GLFW Template with GLEW"
+#define APP_NAME "GLFW Template with GLAD"
 #define APP_VERSION "1.0.0"
 
 // Window defaults
 #define WINDOW_WIDTH 800
 #define WINDOW_HEIGHT 600
-#define WINDOW_TITLE "GLFW + GLEW Template Application"
+#define WINDOW_TITLE "GLFW + GLAD Template Application"
 
-// GLEW must be included before GLFW to avoid gl.h conflicts
-// On macOS, keep original behavior
-#if GLFW_PLATFORM_MACOS
- #include <GL/glew.h>
- #include <GLFW/glfw3.h>
-#else
- // On Linux, GLEW must also come first since glfw3.h includes gl.h internally
- #include <GL/glew.h>
- #include <GLFW/glfw3.h>
-#endif
+// GLAD must be included before GLFW to avoid gl.h conflicts
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
 
 #endif // GLFW_TEMPLATE_COMMON_H
